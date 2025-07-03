@@ -13,9 +13,9 @@ function App() {
     <main className="grid justify-center items-center min-h-screen">
       <div
         className="flex flex-col bg-[#3d434b] w-[90vw] 
-      items-center border-b-2 border-[#020617] rounded-xl"
+      items-center rounded-xl"
       >
-        <header>
+        <header className="flex justify-center w-full border-b-[1.5px] border-[#000000]">
           <ul className="flex">
             <ViewItem view={view} setView={setView} name="Dia" />
             <ViewItem view={view} setView={setView} name="Semana" />
