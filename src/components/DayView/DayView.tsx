@@ -1,10 +1,12 @@
-import { useDateStore } from "../store/useDateStore";
-import { useListStore } from "../store/useListStore";
+import { useDateStore } from "../../store/useDateStore";
+import { useListStore } from "../../store/useListStore";
 import { format, addDays, subDays } from "date-fns";
 import { es } from "date-fns/locale";
-import { AddIcon, TresPuntosIcon } from "../assets/IconsSvg";
+import { AddIcon } from "../../assets/IconsSvg";
 import { useState, useEffect } from "react";
-import type { ListInterface } from "../lib/type";
+import type { ListInterface } from "../../lib/type";
+import HeaderDay from "./HeaderDay";
+import ListDay from "./ListDay";
 
 const DayView = () => {
   const date = useDateStore((state) => state.date);
@@ -23,6 +25,8 @@ const DayView = () => {
   const [tarea, setTarea] = useState<string>("");
   const [checked, setChecked] = useState<boolean>(false);
 
+  const [openDialogIndex, setOpenDialogIndex] = useState<number | null>(null);
+
   const handlePrevDay = () => {
     setDate(subDays(date, 1));
   };
@@ -34,6 +38,7 @@ const DayView = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newTarea: ListInterface = {
+      id: Date.now(),
       diaSemana: diaSemana,
       diaMes: diaMes,
       mes: mes,
@@ -52,43 +57,31 @@ const DayView = () => {
     setList(updatedList);
   }
 
+  const handleOpenDialog = (index: number) => {
+    if (openDialogIndex === index) {
+      setOpenDialogIndex(null); // Cierra si ya está abierto
+    } else {
+      setOpenDialogIndex(index); // Abre el actual
+    }
+  };
+  
+
   useEffect(()=>{
     localStorage.setItem("list", JSON.stringify(list))
   },[list])
 
   return (
     <div>
-      <header className="flex flex-col items-center gap-3 my-16">
-        <section className="flex items-center gap-10">
-          <button
-            onClick={handlePrevDay}
-            className="text-4xl cursor-pointer text-[#9a9fa7] font-bold"
-          >
-            {"<"}
-          </button>
-
-          <div className="flex flex-col items-center">
-            <span className="text-3xl font-bold">{diaSemana}</span>
-            <span className="text-sm text-[#9a9fa7]">
-              {mes} {diaMes}, {anio}
-            </span>
-          </div>
-
-          <button
-            onClick={handleNextDay}
-            className="text-4xl cursor-pointer text-[#9a9fa7] font-bold"
-          >
-            {">"}
-          </button>
-        </section>
-
-        <input
-          type="date"
-          value={format(date, "yyyy-MM-dd", { locale: es })}
-          onChange={(e) => setDate(new Date(e.target.value + "T00:00:00"))}
-          className="border border-[#9a9fa7] rounded-lg px-2 py-1"
-        />
-      </header>
+      <HeaderDay 
+        handlePrevDay={handlePrevDay}
+        handleNextDay={handleNextDay}
+        diaSemana={diaSemana}
+        diaMes={diaMes}
+        mes={mes}
+        anio={anio}
+        date={date}
+        setDate={setDate}
+      />
 
       <section className="flex flex-col justify-center items-center">
         <form onSubmit={handleSubmit}>
@@ -106,17 +99,16 @@ const DayView = () => {
           </label>
         </form>
 
-        <ul className="my-5">
-          {list.map((item, index) => (
-            <li key={index} className="flex w-[300px] items-center justify-between my-2">
-              <label>
-                <input checked={item.checked} onChange={(e) => handleChecked(e,index)} className="accent-[#9c244c]" type="checkbox" />
-                <span className="ml-2">{item.tarea}</span>
-              </label>
-              <span className="cursor-pointer">
-                <TresPuntosIcon />
-              </span>
-            </li>
+        <ul className="mt-5 mb-8">
+          {list.filter((item) => item.mes === mes && item.diaMes === diaMes && item.anio === anio).map((item, index) => (
+            <ListDay 
+              key={index}
+              item={item}
+              index={index}
+              handleChecked={handleChecked}
+              handleOpenDialog={handleOpenDialog}
+              openDialogIndex={openDialogIndex}
+            />
           ))}
         </ul>
       </section>

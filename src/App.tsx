@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import ViewItem from "./components/ViewItem";
-import DayView from "./components/DayView";
+import DayView from "./components/DayView/DayView";
 import WeekView from "./components/WeekView";
 import MonthView from "./components/MonthView";
 import YearView from "./components/YearView";
